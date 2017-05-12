@@ -7,7 +7,7 @@
     #time{
         color: white;
         text-align: center;
-        font-size: 40vh;
+        font-size: 30vh;
     }
     </style>
 </head>
@@ -27,7 +27,7 @@
       }).done(function(result) {
              debugger;
            var eta =result.busETA[2].etaData[0].etaMinutes;
-        document.getElementById('time').innerHTML = ("NEXT BUS ARRIVING IN " + eta + " MINUTES<br>")
+        document.getElementById('time').innerHTML = ("NEXT BUS <br> ARRIVING <br> IN " + eta + " MINUTES<br>")
 });
 });    
 
