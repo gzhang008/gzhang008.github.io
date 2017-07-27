@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="http://mfxuan.free.800m.net/blogCss/reset.css" type="text/css" rel="stylesheet" />
+    <link href="http://mfxuan.free.800m.net/blogCss/main.css" rel="stylesheet" type="text/css" />
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <style type="text/css">
+        html {height: auto;}
+        body {height: auto;margin: 0;padding: 0;}
+        #map_canvas {width:1000px;height: 900px;position: absolute;}
+        @media print {#map_canvas {height: 950px;}}
+        #floating-panel {
+            position: absolute;
+            top: 10px;
+            left: 1%;
+            z-index: 5;
+            background-color: #fff;
+            padding: 5px;
+            border: 1px solid #999;
+            text-align: center;
+            font-family: 'Roboto','sans-serif';
+            line-height: 30px;
+            padding-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="floating-panel">
+        <h1>NTU Campus map</h1>
+        <input onclick="RedLine();" type=button value="Red Line">
+        <input onclick="BlueLine();" type=button value="Blue Line">
+        <input onclick="GreenLine();" type=button value="Green Line">
+        <input onclick="BrownLine();" type=button value="Brown Line">
+    </div>
+    <script>
+        var p;//定义景点坐标数组
+        var map;//定义地图对象s
+        var markers = [];//记录所有景点的Marker信息
+        var vehicles = [];
+        var mydate = new Date();
+        var myday = mydate.getDay();
+        myday = parseFloat(myday);
+
+        const REQUEST_URL = 'https://baseride.com/routes/apigeo/routevariantvehicle/';
+        const BLUE_BUS = 44479;
+        const RED_BUS = 44478;
+        const GREEN_BUS = 44480;
+        const BROWN_BUS = 44481;
+
+        var BUS = 44479;
+
+        //To choose which campus and correspndDing to API
+        function RedLine() {
+            BUS = RED_BUS;
+            console.log(BUS)
+        }
+        function BlueLine() {
+            BUS = BLUE_BUS;
+            console.log(BUS);
+        }
+        function GreenLine() {
+            if(myday === 6 || myday === 7){
+                alert("There is no Green line on weekend, please choose weekend rider!!!");
+            }else {
+                BUS = GREEN_BUS;
+                console.log(BUS)
+            }
+        }
+        function BrownLine() {
+            if(myday === 6 || myday === 7) {
+                BUS = BROWN_BUS;
+                console.log(BUS)
+            }else{
+                alert("There is no weekend rider on weekday, please choose campus rider!!!");
+            }
+        }
+
+
+        $( document ).ready(function() {
+            var mapProp= {
+                center:new google.maps.LatLng(1.3484, 103.6851),
+                zoom:16,
+            };
+        map = new google.maps.Map(document.getElementById("map_canvas"),mapProp);
+
+        var fetchBus = function () {
+            $.ajax({
+                 url: REQUEST_URL + BUS + '/?format=json&junk=' + Math.random()
+            }).done(function(results) {
+                vehicles = results.vehicles;
+
+                console.log(vehicles[0].lat);
+                console.log(vehicles[0].lon);
+
+                //To clear all the markers before all again
+                for (var k = 0; k < markers.length; k++) {
+                    markers[k].setMap(null);
+                }
+
+                p = [{x:0,y:0,title:'Bus Stop'}];
+
+                //To add all the bus information
+                for(var j=0;j<vehicles.length;j++ ){
+                    var lanx = parseFloat(vehicles[j].lat);
+                    var lany = parseFloat(vehicles[j].lon);
+                    p[j] = {x:lanx,y:lany,title:'Bus Stop'}
+                }
+
+                //To add marker
+                for(var i=0;i<p.length;i++){
+                    var image = 'http://api.go2map.com/maps/images/v2.0/flag.png';
+                    var marker = new google.maps.Marker({
+                        position: {lat: p[i].x, lng: p[i].y},
+                        map: map,
+                        title:p[i].title,
+                        icon:image,
+                        visible:true
+                    });
+                    markers.push(marker);
+                }
+            });
+            setTimeout(fetchBus,1000);
+        };
+        fetchBus();
+        });
+    </script>
+<div id="map_canvas"></div>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAYQuEPQE-hXeHmQaDyaDsvJ848jei8uTA&callback=myMap"></script>
+<p>Click on the map to add markers.</p>
+</body>
+</html>
