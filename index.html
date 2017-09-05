@@ -10,14 +10,16 @@
         #map_canvas {width:900px;height: 800px;position: absolute;}
         @media print {#map_canvas {height: 950px;}}
         #floating-panel {
+            background-image: url('Image/bus3.jpg');
+            background-size: 80px 60px;
+            background-repeat: no-repeat;
             position: absolute;
             top: 10px;
-            left: ;
             z-index: 5;
             background-color: #fff;
             padding: 5px;
             border: 1px solid #999;
-            text-align: center;
+            text-align: right;
             font-family: 'Roboto','sans-serif';
             line-height: 30px;
             padding-left: 10px;
@@ -316,7 +318,6 @@
 
                         //To add marker
                         for(var i=0;i<p.length;i++){
-//                            var image = 'Image/bus2.jpg';
                             var image = {
                                 url: 'Image/bus2.jpg',
                                 scaledSize: new google.maps.Size(28,30)
@@ -334,7 +335,6 @@
                             markers.push(marker);
                             console.log(markers[0].title);
                         }
-
                     });
                     setTimeout(fetchBus,4000);
                 };
