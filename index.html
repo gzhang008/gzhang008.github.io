@@ -40,6 +40,7 @@
         var mydate = new Date();
         var myday = mydate.getDay();
         var stop;
+        var clearStop;
         myday = parseFloat(myday);
 
         const REQUEST_URL = 'https://baseride.com/routes/apigeo/routevariantvehicle/';
@@ -97,6 +98,7 @@
 
         //To choose which campus and corresponding to API
         function RedLine() {
+            clearStop = 1;
             pathColor = "#FF0000";
             BUS = RED_BUS;
             console.log(BUS);
@@ -146,6 +148,7 @@
             ];
         }
         function BlueLine() {
+            clearStop = 1;
             BUS = BLUE_BUS;
             console.log(BUS);
             pathColor = "#424bf4";
@@ -194,6 +197,7 @@
             ];
         }
         function GreenLine() {
+            clearStop = 1;
             pathColor = "#138c17";
             pathCoordinates = [
                 {lat: 1.34481206, lng: 103.68097881},
@@ -263,8 +267,15 @@
 
                     //To clear all the markers before all again
                     for (var m = 0; m < markers.length; m++) {
-                        markers[m].setMap(null);
+                        if(markers[m].title === "Bus") {
+                            markers[m].setMap(null);
+//                            console.log(markers[m].title);
+                        }
+                        else if(clearStop === 1 && markers[m].title === "stop"){
+                                markers[m].setMap(null);
+                        }
                     }
+                    clearStop = 0;
 
                     //To draw updated path
                     drawPath = new google.maps.Polyline({
@@ -295,27 +306,37 @@
 
                         //To add all the bus information
                         for(var j=0;j<vehicles.length;j++ ){
-                            var lanx = parseFloat(vehicles[j].lat);
-                            var lany = parseFloat(vehicles[j].lon);
-                            p[j] = {x:lanx,y:lany,title:'Bus'}
+                            if(vehicles[j].stats.avg_speed > 0.0001){
+                                 console.log(vehicles[j].stats.avg_speed);
+                                var lanx = parseFloat(vehicles[j].lat);
+                                var lany = parseFloat(vehicles[j].lon);
+                                p[j] = {x:lanx,y:lany,title:'Bus'}
+                            }
                         }
 
                         //To add marker
                         for(var i=0;i<p.length;i++){
-                            var image = 'Image/bus2.jpg';
-                            var marker = new google.maps.Marker({
-                                position: {lat: p[i].x, lng: p[i].y},
-                                map: map,
-                                title:p[i].title,
-                                icon:image,
-                                visible:true
-                            });
+//                            var image = 'Image/bus2.jpg';
+                            var image = {
+                                url: 'Image/bus2.jpg',
+                                scaledSize: new google.maps.Size(28,30)
+                            }
+//                            var image = 'http://api.go2map.com/maps/images/v2.0/flag.png';
+                            if (p[i]){
+                                var marker = new google.maps.Marker({
+                                    position: {lat: p[i].x, lng: p[i].y},
+                                    map: map,
+                                    title:p[i].title,
+                                    icon:image,
+                                    visible:true
+                                });
+                            }
                             markers.push(marker);
                             console.log(markers[0].title);
                         }
 
                     });
-                    setTimeout(fetchBus,2000);
+                    setTimeout(fetchBus,4000);
                 };
                 fetchBus();
         });
